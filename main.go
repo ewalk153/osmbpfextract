@@ -173,7 +173,8 @@ func findMatchingWaysPass(file *os.File, filterTag string, filterValues []string
 								if periph {
 									highway = "peripherique"
 								}
-								wayqueue <- &myway{id: *way.Id, Name: strings.Replace(name, ",", "", -1), Ref: ref, nodeIds: nodeRefs, highway: highway, oneway: oneway}
+
+								wayqueue <- &myway{id: *way.Id, Name: stripBadChars(name), Ref: ref, nodeIds: nodeRefs, highway: highway, oneway: oneway}
 							}
 						}
 					}
@@ -225,6 +226,10 @@ func findMatchingWaysPass(file *os.File, filterTag string, filterValues []string
 
 	<-done
 	return wayNodeRefs
+}
+
+func stripBadChars(s string) string {
+	return strings.Replace(strings.Replace(s, ",", "", -1), "\"", "", -1)
 }
 
 func findMatchingNodesPass(file *os.File, wayNodeRefs [][]int64, totalBlobCount int, output *bufio.Writer) {
