@@ -79,7 +79,7 @@ func supportedFilePass(file *os.File) {
 }
 
 func containsValue(el *string, list *[]string) bool {
-	if list == nil || len(list) == 0 {
+	if list == nil || len(*list) == 0 {
 		return true
 	}
 	for _, elx := range *list {
@@ -144,7 +144,7 @@ func findMatchingWaysPass(file *os.File, filterTag string, filterValues []string
 								valueIndex := way.Vals[i]
 								key := string(primitiveBlock.Stringtable.S[keyIndex])
 								value := string(primitiveBlock.Stringtable.S[valueIndex])
-								if key == filterTag && containsValue(&value, &filterValues) { 
+								if key == filterTag && containsValue(&value, &filterValues) {
 									nodeRefs = make([]int64, len(way.Refs))
 									var prevNodeId int64 = 0
 									for index, deltaNodeId := range way.Refs {
