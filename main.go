@@ -79,7 +79,7 @@ func supportedFilePass(file *os.File) {
 }
 
 func containsValue(el *string, list *[]string) bool {
-	if list == nil {
+	if list == nil || len(*list) == 0 {
 		return true
 	}
 	for _, elx := range *list {
@@ -144,7 +144,7 @@ func findMatchingWaysPass(file *os.File, filterTag string, filterValues []string
 								valueIndex := way.Vals[i]
 								key := string(primitiveBlock.Stringtable.S[keyIndex])
 								value := string(primitiveBlock.Stringtable.S[valueIndex])
-								if key == filterTag { // && containsValue(&value, &filterValues)
+								if key == filterTag && containsValue(&value, &filterValues) {
 									nodeRefs = make([]int64, len(way.Refs))
 									var prevNodeId int64 = 0
 									for index, deltaNodeId := range way.Refs {
@@ -173,7 +173,8 @@ func findMatchingWaysPass(file *os.File, filterTag string, filterValues []string
 								if periph {
 									highway = "peripherique"
 								}
-								wayqueue <- &myway{id: *way.Id, Name: strings.Replace(name, ",", "", -1), Ref: ref, nodeIds: nodeRefs, highway: highway, oneway: oneway}
+
+								wayqueue <- &myway{id: *way.Id, Name: stripBadChars(name), Ref: ref, nodeIds: nodeRefs, highway: highway, oneway: oneway}
 							}
 						}
 					}
@@ -225,6 +226,10 @@ func findMatchingWaysPass(file *os.File, filterTag string, filterValues []string
 
 	<-done
 	return wayNodeRefs
+}
+
+func stripBadChars(s string) string {
+	return strings.Replace(strings.Replace(s, ",", "", -1), "\"", "", -1)
 }
 
 func findMatchingNodesPass(file *os.File, wayNodeRefs [][]int64, totalBlobCount int, output *bufio.Writer) {
